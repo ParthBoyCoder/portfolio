@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parthib Banerjee — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#080c10;--bg2:#0d1117;--bg3:#111820;
+    --surface:#141c26;--border:#1e2d40;--border2:#253447;
+    --green:#00ff88;--green2:#00cc6a;--green3:#00ff8822;
+    --cyan:#00d4ff;--amber:#ffb400;--red:#ff4444;
+    --text:#e8f0fe;--text2:#8899aa;--text3:#445566;
+    --mono:'JetBrains Mono',monospace;--sans:'Syne',sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  /* Hide system cursor everywhere */
+  *,*::before,*::after{cursor:none!important;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+
+  /* CUSTOM CURSOR */
+  .cursor{width:14px;height:14px;border:1.5px solid var(--green);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference;}
+  .cursor.hov{width:30px;height:30px;background:rgba(0,255,136,.1);}
+  .cursor-trail{width:5px;height:5px;background:var(--green);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;opacity:.35;transform:translate(-50%,-50%);transition:left .08s linear,top .08s linear;}
+
+  /* NOISE */
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");opacity:.025;pointer-events:none;z-index:0;}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:.85rem 2.5rem;background:rgba(8,12,16,.85);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:none;}
+  nav.visible{display:flex;}
+  .nav-logo{font-family:var(--mono);font-size:.85rem;color:var(--green);letter-spacing:.05em;}
+  .nav-logo span{color:var(--text2);}
+  .nav-links{display:flex;gap:1.6rem;list-style:none;flex-wrap:wrap;}
+  .nav-links a{font-family:var(--mono);font-size:.7rem;color:var(--text2);text-decoration:none;transition:color .2s;letter-spacing:.04em;}
+  .nav-links a:hover,.nav-links a.active{color:var(--green);}
+  .nav-links a.active::before{content:'// ';color:var(--green3);}
+
+  /* TERMINAL */
+  #terminal-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease;}
+  #terminal-screen.exit{opacity:0;transform:scale(.97);pointer-events:none;}
+  .terminal-window{width:min(740px,95vw);background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;box-shadow:0 0 80px rgba(0,255,136,.04),0 0 0 1px rgba(0,255,136,.06);}
+  .terminal-bar{background:var(--surface);padding:.65rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot-r{background:#ff5f56;}.dot-a{background:#ffbd2e;}.dot-g{background:#27c93f;}
+  .terminal-title{font-family:var(--mono);font-size:.72rem;color:var(--text3);margin:0 auto;}
+  .terminal-body{padding:1.5rem;min-height:340px;font-family:var(--mono);font-size:.82rem;line-height:1.9;overflow-y:auto;max-height:70vh;}
+  .tl{color:var(--text2);}.tg{color:var(--green);}.tc{color:var(--cyan);}.ta{color:var(--amber);}.td{color:var(--text3);}.te{color:var(--red);}
+  .t-prompt{display:flex;align-items:center;gap:.4rem;margin-top:.5rem;}
+  .t-sym{color:var(--green);white-space:nowrap;}
+  #t-input{background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:.82rem;caret-color:var(--green);flex:1;min-width:0;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* PAGES */
+  .page{display:none;min-height:100vh;padding-top:4rem;}
+  .page.active{display:block;}
+
+  /* HOME */
+  #home{display:none;min-height:100vh;position:relative;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:4rem 2rem 2rem;overflow:hidden;}
+  #home.active{display:flex;}
+  .hero-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,255,136,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,black 0%,transparent 100%);}
+  .hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.055) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;}
+  .hero-tag{font-family:var(--mono);font-size:.72rem;color:var(--green);letter-spacing:.15em;margin-bottom:1rem;}
+  .hero-name{font-size:clamp(2.8rem,8vw,6rem);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:.5rem;}
+  .hero-name span{color:var(--green);}
+  .hero-sub{font-family:var(--mono);font-size:.88rem;color:var(--text2);margin-bottom:2.5rem;}
+  .hero-sub span{color:var(--cyan);}
+  .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;}
+  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;border-radius:6px;font-family:var(--mono);font-size:.78rem;text-decoration:none;transition:all .2s;letter-spacing:.05em;border:none;}
+  .btn-p{background:var(--green);color:#080c10;font-weight:700;}
+  .btn-p:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,255,136,.25);}
+  .btn-o{background:transparent;color:var(--text);border:1px solid var(--border2);}
+  .btn-o:hover{border-color:var(--green);color:var(--green);transform:translateY(-2px);}
+  .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-width:460px;width:100%;}
+  .stat{background:var(--bg2);padding:1rem;text-align:center;}
+  .stat-num{font-size:1.6rem;font-weight:800;color:var(--green);}
+  .stat-label{font-family:var(--mono);font-size:.6rem;color:var(--text3);margin-top:.2rem;letter-spacing:.08em;}
+  .age-c{font-family:var(--mono);font-size:.68rem;color:var(--text3);margin-top:2rem;}
+  .age-c span{color:var(--amber);}
+
+  /* COMMON */
+  section{padding:5rem 0;}
+  .container{max-width:1100px;margin:0 auto;padding:0 2rem;}
+  .s-tag{font-family:var(--mono);font-size:.7rem;color:var(--green);letter-spacing:.15em;margin-bottom:.75rem;}
+  .s-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem;}
+  .s-title span{color:var(--green);}
+  .s-desc{color:var(--text2);font-size:.92rem;max-width:560px;line-height:1.75;margin-bottom:3rem;}
+
+  /* ABOUT */
+  .ag{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
+  @media(max-width:700px){.ag{grid-template-columns:1fr;}}
+  .bio{font-size:.95rem;color:var(--text2);line-height:1.9;}
+  .bio strong{color:var(--text);}
+  .bio .hl{color:var(--green);font-family:var(--mono);}
+  .facts{display:grid;gap:.65rem;}
+  .fc{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.85rem 1.1rem;display:flex;gap:.85rem;align-items:flex-start;transition:border-color .2s,transform .2s;}
+  .fc:hover{border-color:var(--border2);transform:translateX(3px);}
+  .fi{font-size:1.1rem;flex-shrink:0;margin-top:1px;}
+  .ft strong{font-size:.82rem;color:var(--text);display:block;margin-bottom:.1rem;}
+  .ft span{font-size:.73rem;color:var(--text2);font-family:var(--mono);}
+
+  /* SKILLS */
+  .sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;}
+  .sc{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;}
+  .sct{font-size:.72rem;font-family:var(--mono);color:var(--green);margin-bottom:1.25rem;letter-spacing:.1em;}
+  .sb{margin-bottom:1rem;}
+  .sbt{display:flex;justify-content:space-between;margin-bottom:.38rem;}
+  .sn{font-size:.82rem;color:var(--text);}
+  .sp{font-family:var(--mono);font-size:.7rem;color:var(--text3);}
+  .st{height:3px;background:var(--border);border-radius:3px;overflow:hidden;}
+  .sf{height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:3px;width:0;transition:width 1.2s cubic-bezier(.4,0,.2,1);}
+  .stags{display:flex;flex-wrap:wrap;gap:.42rem;margin-top:1rem;}
+  .tag{font-family:var(--mono);font-size:.63rem;padding:.2rem .6rem;border:1px solid var(--border2);border-radius:4px;color:var(--text3);transition:border-color .2s,color .2s;}
+  .tag:hover{border-color:var(--green);color:var(--green);}
+
+  /* ACHIEVEMENTS */
+  .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.4rem;}
+  .ac{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .3s,transform .3s,box-shadow .3s;}
+  .ac:hover{border-color:var(--green);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,255,136,.08);}
+  .act{padding:1.1rem 1.1rem .85rem;display:flex;gap:.85rem;align-items:flex-start;}
+  .ai{width:40px;height:40px;border-radius:8px;background:var(--green3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+  .am{flex:1;min-width:0;}
+  .atitle{font-size:.87rem;font-weight:700;color:var(--text);margin-bottom:.18rem;line-height:1.35;}
+  .adate{font-family:var(--mono);font-size:.63rem;color:var(--text3);}
+  .abadge{display:inline-block;font-family:var(--mono);font-size:.57rem;padding:.15rem .52rem;border-radius:3px;margin-top:.3rem;letter-spacing:.04em;}
+  .bg{background:rgba(255,180,0,.1);color:var(--amber);border:1px solid rgba(255,180,0,.22);}
+  .bs{background:rgba(136,153,180,.1);color:#99aacc;border:1px solid rgba(136,153,180,.22);}
+  .bb{background:rgba(200,140,80,.1);color:#cc9955;border:1px solid rgba(200,140,80,.22);}
+  .bc{background:rgba(0,212,255,.08);color:var(--cyan);border:1px solid rgba(0,212,255,.2);}
+  .bp{background:rgba(160,100,255,.08);color:#bb88ff;border:1px solid rgba(160,100,255,.2);}
+  .ashort{padding:0 1.1rem 1rem;font-size:.79rem;color:var(--text2);line-height:1.6;}
+  .atoggle{width:100%;background:none;border:none;border-top:1px solid var(--border);padding:.6rem 1.1rem;font-family:var(--mono);font-size:.63rem;color:var(--text3);text-align:left;transition:color .2s,background .2s;display:flex;align-items:center;gap:.4rem;}
+  .atoggle:hover{color:var(--green);background:var(--green3);}
+  .arr{transition:transform .3s;display:inline-block;}
+  .atoggle.open .arr{transform:rotate(90deg);}
+  .aexpand{max-height:0;overflow:hidden;transition:max-height .4s ease;}
+  .aexpand.open{max-height:320px;}
+  .aei{padding:1rem 1.1rem;border-top:1px solid var(--border);}
+  .aei p{font-size:.78rem;color:var(--text2);line-height:1.7;}
+  .aimg{margin-top:.75rem;height:72px;background:var(--bg3);border-radius:6px;border:1px dashed var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.62rem;color:var(--text3);}
+  .alinks{display:flex;gap:.55rem;margin-top:.75rem;flex-wrap:wrap;}
+  .alink{font-family:var(--mono);font-size:.63rem;color:var(--cyan);text-decoration:none;padding:.18rem .58rem;border:1px solid rgba(0,212,255,.2);border-radius:3px;transition:background .2s;}
+  .alink:hover{background:rgba(0,212,255,.08);}
+
+  /* PROJECTS */
+  .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.5rem;}
+  .pc{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .3s,transform .3s,box-shadow .3s;display:flex;flex-direction:column;}
+  .pc:hover{border-color:var(--green);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,255,136,.08);}
+  .pimg{height:128px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  .pib{position:absolute;inset:0;opacity:.06;background:repeating-linear-gradient(45deg,var(--green) 0,var(--green) 1px,transparent 0,transparent 50%);background-size:10px 10px;}
+  .pb{padding:1.15rem;flex:1;display:flex;flex-direction:column;}
+  .pn{font-size:.98rem;font-weight:700;margin-bottom:.12rem;color:var(--text);}
+  .ptl{font-family:var(--mono);font-size:.63rem;color:var(--cyan);margin-bottom:.55rem;letter-spacing:.04em;}
+  .pintro{font-size:.77rem;color:var(--text3);font-style:italic;margin-bottom:.6rem;line-height:1.5;border-left:2px solid var(--border2);padding-left:.65rem;}
+  .pdesc{font-size:.8rem;color:var(--text2);line-height:1.65;flex:1;margin-bottom:.9rem;}
+  .ptags{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.9rem;}
+  .ptag{font-family:var(--mono);font-size:.6rem;padding:.17rem .48rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text3);}
+  .plinks{display:flex;gap:.55rem;flex-wrap:wrap;}
+  .pl{font-family:var(--mono);font-size:.67rem;color:var(--text2);text-decoration:none;padding:.3rem .72rem;border:1px solid var(--border);border-radius:5px;transition:all .2s;white-space:nowrap;}
+  .pl:hover{color:var(--green);border-color:var(--green);}
+  .pl.gh::before{content:'◈ ';}
+  .pl.yt::before{content:'▷ ';color:var(--red);}
+  .pl.inst::before{content:'✦ ';color:var(--amber);}
+
+  /* YOUTUBE */
+  .yt-banner{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.75rem;margin-bottom:2.25rem;}
+  @media(max-width:600px){.yt-banner{flex-direction:column;text-align:center;}}
+  .yta{width:60px;height:60px;border-radius:50%;background:rgba(255,68,68,.12);border:2px solid rgba(255,68,68,.3);display:flex;align-items:center;justify-content:center;font-size:1.6rem;flex-shrink:0;}
+  .ytcn{font-size:1.05rem;font-weight:700;margin-bottom:.28rem;}
+  .ytcm{font-family:var(--mono);font-size:.7rem;color:var(--text3);}
+  .ytcm span{color:var(--green);}
+  .ytcta{margin-left:auto;}
+  .yt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:1.15rem;}
+  .yc{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .25s;text-decoration:none;display:block;}
+  .yc:hover{border-color:var(--red);transform:translateY(-3px);box-shadow:0 8px 28px rgba(255,68,68,.08);}
+  .yt{height:118px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:2.4rem;position:relative;border-bottom:1px solid var(--border);}
+  .yp{position:absolute;width:32px;height:32px;background:rgba(255,68,68,.88);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;padding-left:2px;color:#fff;}
+  .yi{padding:.75rem;}
+  .ytitle{font-size:.76rem;font-weight:600;margin-bottom:.28rem;line-height:1.4;color:var(--text);}
+  .ysub{font-family:var(--mono);font-size:.62rem;color:var(--text3);}
+
+  /* CONTACT */
+  .cg{display:grid;grid-template-columns:1fr 1.15fr;gap:3rem;}
+  @media(max-width:700px){.cg{grid-template-columns:1fr;}}
+  .ci h3{font-size:1.25rem;margin-bottom:.8rem;}
+  .ci p{font-size:.85rem;color:var(--text2);line-height:1.75;margin-bottom:1.65rem;}
+  .cls{display:flex;flex-direction:column;gap:.6rem;}
+  .cl{display:flex;align-items:center;gap:.85rem;padding:.75rem .95rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;text-decoration:none;transition:all .2s;}
+  .cl:hover{border-color:var(--green);transform:translateX(3px);}
+  .cli{width:28px;height:28px;border-radius:5px;background:var(--green3);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.68rem;color:var(--green);flex-shrink:0;}
+  .clt strong{display:block;font-size:.79rem;color:var(--text);}
+  .clt span{font-family:var(--mono);font-size:.64rem;color:var(--text3);}
+  .cf{display:flex;flex-direction:column;gap:.85rem;}
+  .fg{display:flex;flex-direction:column;gap:.32rem;}
+  .fl{font-family:var(--mono);font-size:.65rem;color:var(--text3);letter-spacing:.1em;}
+  .fi2,.fta{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.68rem .88rem;color:var(--text);font-family:var(--sans);font-size:.83rem;outline:none;transition:border-color .2s;resize:vertical;}
+  .fi2:focus,.fta:focus{border-color:var(--green);}
+  .fta{min-height:108px;}
+  .fsub{background:var(--green);color:#080c10;border:none;padding:.7rem 1.5rem;border-radius:6px;font-family:var(--mono);font-size:.77rem;font-weight:700;transition:all .2s;}
+  .fsub:hover{background:var(--green2);transform:translateY(-1px);}
+
+  /* FOOTER */
+  footer{text-align:center;padding:2.5rem 2rem;border-top:1px solid var(--border);font-family:var(--mono);font-size:.67rem;color:var(--text3);line-height:2.2;}
+  footer span{color:var(--green);}
+  .wip{display:inline-block;margin-left:.5rem;font-size:.59rem;padding:.13rem .48rem;border:1px solid rgba(255,180,0,.25);border-radius:3px;color:var(--amber);vertical-align:middle;}
+  footer a{color:var(--text3);text-decoration:none;margin:0 .65rem;transition:color .2s;}
+  footer a:hover{color:var(--green);}
+
+  /* ANIMATIONS */
+  .fi{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease;}
+  .fi.vis{opacity:1;transform:translateY(0);}
+  .d1{transition-delay:.08s;}.d2{transition-delay:.16s;}.d3{transition-delay:.24s;}
+
+  @media(max-width:600px){
+    nav{padding:.7rem 1rem;}
+    .nav-links{gap:.85rem;}
+    .hero-stats{grid-template-columns:1fr 1fr;}
+    .stat:last-child{grid-column:span 2;}
+    section{padding:3.5rem 0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cur-trail"></div>
+
+<!-- NAV -->
+<nav id="main-nav">
+  <div class="nav-logo">parth<span>.dev</span></div>
+  <ul class="nav-links">
+    <li><a href="#" onclick="SP('home',this);return false;">home</a></li>
+    <li><a href="#" onclick="SP('about',this);return false;">about</a></li>
+    <li><a href="#" onclick="SP('skills',this);return false;">skills</a></li>
+    <li><a href="#" onclick="SP('achievements',this);return false;">achievements</a></li>
+    <li><a href="#" onclick="SP('projects',this);return false;">projects</a></li>
+    <li><a href="#" onclick="SP('youtube',this);return false;">youtube</a></li>
+    <li><a href="#" onclick="SP('contact',this);return false;">contact</a></li>
+  </ul>
+</nav>
+
+<!-- ══════════════ TERMINAL ══════════════ -->
+<div id="terminal-screen">
+  <div class="terminal-window">
+    <div class="terminal-bar">
+      <div class="dot dot-r"></div><div class="dot dot-a"></div><div class="dot dot-g"></div>
+      <span class="terminal-title">bash — parth@portfolio ~</span>
+    </div>
+    <div class="terminal-body" id="t-body">
+      <div id="t-out"></div>
+      <div class="t-prompt">
+        <span class="t-sym">parth@portfolio:~$&nbsp;</span>
+        <input type="text" id="t-in" autocomplete="off" autocorrect="off" spellcheck="false" autofocus>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ HOME ══════════════ -->
+<div id="home" class="page">
+  <div class="hero-grid"></div><div class="hero-glow"></div>
+  <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;">
+    <div class="hero-tag fi">// WELCOME TO MY PORTFOLIO</div>
+    <h1 class="hero-name fi d1">Parth<span>ib</span><br>Banerjee</h1>
+    <p class="hero-sub fi d2"><span>[ Robotics &bull; AI &bull; Coding ]</span> &mdash; Class X, Kolkata, India</p>
+    <div class="hero-btns fi d3">
+      <button class="btn btn-p" onclick="SP('projects')">View Projects &rarr;</button>
+      <button class="btn btn-o" onclick="SP('contact')">Get In Touch</button>
+    </div>
+    <div class="hero-stats fi">
+      <div class="stat"><div class="stat-num">6+</div><div class="stat-label">STATE EXHIBITIONS</div></div>
+      <div class="stat"><div class="stat-num">4+</div><div class="stat-label">OPEN SOURCE PROJECTS</div></div>
+      <div class="stat"><div class="stat-num" id="age-d">15</div><div class="stat-label">YEARS OLD</div></div>
+    </div>
+    <div class="age-c">live age: <span id="precise-age">calculating...</span></div>
+  </div>
+</div>
+
+<!-- ══════════════ ABOUT ══════════════ -->
+<div id="about" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 001 &mdash; ABOUT ME</div>
+    <h2 class="s-title">Who Am <span>I?</span></h2>
+    <div class="ag">
+      <div>
+        <p class="bio">
+          Hey! I'm <strong>Parthib Banerjee</strong> &mdash; a <strong>15-year-old</strong> student from <strong>Kolkata, India</strong>, currently in <span class="hl">Class X</span>.<br><br>
+          I've been <strong>self-teaching programming since Class VI</strong>, and somewhere along the way fell completely in love with robotics and AI. I went from blinking LEDs on an Arduino to competing at <strong>state-level science exhibitions</strong> across India and placing first at Apeejay Terra Nova RoboMaze Runner.<br><br>
+          I run a <span class="hl">YouTube channel</span> documenting my builds, founded and taught a <strong>robotics club</strong> at school from Class IX, and build open-source projects that are actually useful. I also do real tech work helping at <strong>my father's company</strong> since Class VII &mdash; AI docs, software debugging, and hardware fixes.<br><br>
+          This portfolio is a <span class="hl">work in progress</span>, just like me. Last updated: April 2026.
+        </p>
+      </div>
+      <div class="facts">
+        <div class="fc"><div class="fi">🤖</div><div class="ft"><strong>Robotics Builder</strong><span>Arduino &bull; ESP32 &bull; Raspberry Pi &bull; Sensors</span></div></div>
+        <div class="fc"><div class="fi">🧠</div><div class="ft"><strong>AI &amp; CV Explorer</strong><span>Python &bull; OpenCV &bull; TensorFlow &bull; OpenCV Univ. Honors</span></div></div>
+        <div class="fc"><div class="fi">🏆</div><div class="ft"><strong>Award Winner</strong><span>1st &mdash; Apeejay Terra Nova RoboMaze &bull; 3rd &mdash; ADI Tech</span></div></div>
+        <div class="fc"><div class="fi">🎥</div><div class="ft"><strong>YouTube Creator</strong><span>@ParthCodesArduinoESP &bull; 5k+ views</span></div></div>
+        <div class="fc"><div class="fi">🎓</div><div class="ft"><strong>Robotics Club Founder</strong><span>Hosted, taught &amp; managed since Class IX</span></div></div>
+        <div class="fc"><div class="fi">💼</div><div class="ft"><strong>Real-World Tech Work</strong><span>Father's company &bull; AI docs, hardware &amp; software fixes since Class VII</span></div></div>
+      </div>
+    </div>
+  </section></div>
+</div>
+
+<!-- ══════════════ SKILLS ══════════════ -->
+<div id="skills" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 002 &mdash; SKILLS</div>
+    <h2 class="s-title">What I <span>Know</span></h2>
+    <p class="s-desc">Self-taught since Class VI. Constantly growing.</p>
+    <div class="sg">
+      <div class="sc">
+        <div class="sct">&mdash; PROGRAMMING</div>
+        <div class="sb"><div class="sbt"><span class="sn">Python</span><span class="sp">80%</span></div><div class="st"><div class="sf" data-w="80"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">C / C++ (Arduino)</span><span class="sp">75%</span></div><div class="st"><div class="sf" data-w="75"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">JavaScript</span><span class="sp">60%</span></div><div class="st"><div class="sf" data-w="60"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">HTML / CSS</span><span class="sp">70%</span></div><div class="st"><div class="sf" data-w="70"></div></div></div>
+        <div class="stags"><span class="tag">Git</span><span class="tag">Linux</span><span class="tag">Web Scraping</span><span class="tag">Arduino IDE</span></div>
+      </div>
+      <div class="sc">
+        <div class="sct">&mdash; ROBOTICS &amp; HARDWARE</div>
+        <div class="sb"><div class="sbt"><span class="sn">Arduino / ESP32</span><span class="sp">85%</span></div><div class="st"><div class="sf" data-w="85"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">Raspberry Pi</span><span class="sp">70%</span></div><div class="st"><div class="sf" data-w="70"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">Sensor Integration</span><span class="sp">75%</span></div><div class="st"><div class="sf" data-w="75"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">Circuit Debugging</span><span class="sp">72%</span></div><div class="st"><div class="sf" data-w="72"></div></div></div>
+        <div class="stags"><span class="tag">GPIO</span><span class="tag">Pi GPIO Pins</span><span class="tag">Servo</span><span class="tag">Motors</span><span class="tag">IoT</span></div>
+      </div>
+      <div class="sc">
+        <div class="sct">&mdash; AI &amp; COMPUTER VISION</div>
+        <div class="sb"><div class="sbt"><span class="sn">OpenCV</span><span class="sp">72%</span></div><div class="st"><div class="sf" data-w="72"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">TensorFlow</span><span class="sp">55%</span></div><div class="st"><div class="sf" data-w="55"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">Face Recognition</span><span class="sp">65%</span></div><div class="st"><div class="sf" data-w="65"></div></div></div>
+        <div class="sb"><div class="sbt"><span class="sn">Data Analysis</span><span class="sp">60%</span></div><div class="st"><div class="sf" data-w="60"></div></div></div>
+        <div class="stags"><span class="tag">NumPy</span><span class="tag">Pandas</span><span class="tag">OpenCV Univ.</span><span class="tag">Autodesk</span></div>
+      </div>
+    </div>
+  </section></div>
+</div>
+
+<!-- ══════════════ ACHIEVEMENTS ══════════════ -->
+<div id="achievements" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 003 &mdash; ACHIEVEMENTS</div>
+    <h2 class="s-title">My <span>Journey</span></h2>
+    <p class="s-desc">Real things I've done, earned, and built &mdash; no fluff. Click any card to read more. Images / e-certificates can be added to each card.</p>
+    <div class="ach-grid">
+
+      <div class="ac">
+        <div class="act"><div class="ai">🥇</div><div class="am"><div class="atitle">Apeejay Terra Nova &mdash; RoboMaze Runner</div><div class="adate">State Level &bull; Apeejay School</div><span class="abadge bg">1ST PLACE</span></div></div>
+        <div class="ashort">Led my team to first place at the Apeejay School Terra Nova RoboMaze Runner state-level robotics competition.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Our robot navigated the maze autonomously using sensor fusion and control logic coded from scratch. Competing against school teams from across the state — one of my proudest robotics moments.</p><div class="aimg">[ Photo / Certificate &mdash; add image here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🥉</div><div class="am"><div class="atitle">ADI Tech Science Exhibition</div><div class="adate">State Exhibition &bull; Certificate Received</div><span class="abadge bb">3RD PLACE + CERT</span></div></div>
+        <div class="ashort">Secured 3rd place at the ADI Tech Science Exhibition and received an official certificate of achievement.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Presented a robotics project and competed against students from multiple schools at this state-level exhibition.</p><div class="aimg">[ Certificate &mdash; add image here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🏅</div><div class="am"><div class="atitle">SOF NCO / ICSO &mdash; School Gold Medalist</div><div class="adate">2023&ndash;24 (WIR 340) &amp; 2024&ndash;25 (WIR 250)</div><span class="abadge bg">2&times; GOLD</span></div></div>
+        <div class="ashort">School gold medal in SOF National Cyber Olympiad / ICSO two years running: 2023&ndash;24 with WIR 340, and 2024&ndash;25 with WIR 250.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Highest score in school for the SOF NCO/ICSO olympiad both years. WIR (World Individual Rank) of 340 and 250 respectively — consistent top performance in competitive computing.</p><div class="aimg">[ Medal / Certificate &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🏫</div><div class="am"><div class="atitle">6 State Science Exhibitions</div><div class="adate">CBSE &times;2 &bull; BESC &bull; Shri Shikshayatan &bull; ADI Tech &bull; Apeejay</div><span class="abadge bc">STATE LEVEL</span></div></div>
+        <div class="ashort">Participated in and led my team across 6 state-level science exhibitions. Received certificates at CBSE (one of two), BESC Science Spectra, and ADI Tech. Placed 1st at Apeejay, 3rd at ADI Tech.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;full list</button>
+        <div class="aexpand"><div class="aei"><p>&#8226; CBSE Science Exhibition &times;2 (certificate in one)<br>&#8226; Science Spectra of BESC (certificate)<br>&#8226; Shri Shikshayatan School<br>&#8226; ADI Tech Science Exhibition &mdash; 3rd place + certificate<br>&#8226; Apeejay School Terra Nova RoboMaze Runner &mdash; 1st place</p><div class="aimg">[ Exhibition photos &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🏫</div><div class="am"><div class="atitle">School Science Exhibitions &mdash; Won &amp; Supervised</div><div class="adate">School Level &bull; 2 Exhibitions</div><span class="abadge bs">WON + SUPERVISED</span></div></div>
+        <div class="ashort">Led and won one school science exhibition. Supervised and managed another as senior team lead.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>In the first, I led and won with my robotics project. In the second I stepped into a supervisory role &mdash; coordinating the team, managing setup, and mentoring younger participants.</p><div class="aimg">[ Photos &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🎓</div><div class="am"><div class="atitle">OpenCV University &mdash; Honors Certificate</div><div class="adate">OpenCV University &bull; Age 14</div><span class="abadge bc">HONORS &bull; AGE 14</span></div></div>
+        <div class="ashort">Earned an OpenCV University Honors Certificate at 14 &mdash; covering computer vision fundamentals and real-time CV applications in Python.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Completed the full OpenCV University curriculum with honors: image processing, object detection, and real-time applications. Applied directly in DrishtiY and SentinAI-CAM.</p><div class="aimg">[ Certificate &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">💻</div><div class="am"><div class="atitle">TestDome Gold Certificate</div><div class="adate">TestDome &bull; Age 14</div><span class="abadge bg">GOLD &bull; AGE 14</span></div></div>
+        <div class="ashort">Achieved a TestDome Gold Certificate at age 14 &mdash; a professional developer skills assessment platform used worldwide by companies for hiring.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>TestDome is used by companies to screen professional developers. Passing at gold level at 14, without formal training, is something I'm proud of.</p><div class="aimg">[ Certificate &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">⭐</div><div class="am"><div class="atitle">Autodesk Instructables &mdash; Featured Project</div><div class="adate">Instructables &bull; Online Contest</div><span class="abadge bp">FEATURED</span></div></div>
+        <div class="ashort">Participated in multiple Autodesk Instructables contests. DrishtiY was featured &mdash; highlighted to a global audience of makers and engineers.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Instructables is a global maker community by Autodesk. Having a project featured puts it in front of a worldwide audience of engineers, educators, and hobbyists.</p><div class="alinks"><a href="https://www.instructables.com/DrishtiY/" target="_blank" class="alink">&#10022; View DrishtiY on Instructables</a></div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🏆</div><div class="am"><div class="atitle">Technical Geek Award &mdash; 2 Years in a Row</div><div class="adate">School Award &bull; Consecutive Years</div><span class="abadge bg">2&times; WINNER</span></div></div>
+        <div class="ashort">Won the school "Technical Geek" award two consecutive years &mdash; recognised by teachers and peers for consistent technical excellence.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>This award is given to the most technically inclined student in school each year. Winning it back-to-back is a reflection of consistent contributions in tech.</p><div class="aimg">[ Award photo &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🎥</div><div class="am"><div class="atitle">YouTube Channel &mdash; 5000+ Views</div><div class="adate">@ParthCodesArduinoESP &bull; Ongoing</div><span class="abadge bc">5K+ VIEWS</span></div></div>
+        <div class="ashort">Running a YouTube channel on robotics and coding. Small subscriber count but 5000+ real views from the global maker community.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Every video is a real build &mdash; no filler. Covers Arduino, ESP32, AI with OpenCV, robotics tutorials, and project walkthroughs. Feedback from makers worldwide has been great.</p><div class="alinks"><a href="https://www.youtube.com/@ParthCodesArduinoESP" target="_blank" class="alink">&#9654; Visit Channel</a></div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🤝</div><div class="am"><div class="atitle">Robotics Club &mdash; Founder, Teacher &amp; Manager</div><div class="adate">School &bull; Since Class IX</div><span class="abadge bs">LEADERSHIP</span></div></div>
+        <div class="ashort">Founded, hosted, taught, and managed a robotics club at school from Class IX. Also part of the Coding Club from Class VII&ndash;VIII.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Covered basic electronics, Arduino programming, and mini-project builds. Teaching others deepened my own understanding. Started with the Coding Club (Class VII&ndash;VIII) before founding the Robotics Club.</p></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">📜</div><div class="am"><div class="atitle">MindLuster Certificates</div><div class="adate">MindLuster &bull; Online Learning</div><span class="abadge bc">CERTIFIED</span></div></div>
+        <div class="ashort">Earned certificates from MindLuster on Pi GPIO Pins and Web Scraping with Python &mdash; skills applied directly in real projects.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Pi GPIO Pins deepened my Raspberry Pi hardware knowledge. Web Scraping with Python unlocked data collection capabilities used in later projects.</p><div class="aimg">[ Certificates &mdash; add here ]</div></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">🔬</div><div class="am"><div class="atitle">NAEST 2025 &mdash; Participant</div><div class="adate">National Anveshika Experimental Science Tournament &bull; 2025</div><span class="abadge bs">PARTICIPANT</span></div></div>
+        <div class="ashort">Participated in NAEST 2025, a prestigious national-level experimental science tournament focused on hands-on scientific thinking.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>NAEST tests real experimental work rather than theory. Competing at national level in this format &mdash; not just multiple choice &mdash; is a strong scientific achievement.</p></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">💼</div><div class="am"><div class="atitle">Working in Father's Company Since Class VII</div><div class="adate">Real-World Tech Work &bull; Class VII onwards</div><span class="abadge bp">REAL WORLD XP</span></div></div>
+        <div class="ashort">Real tech tasks at my father's company since Class VII &mdash; AI-assisted document creation, software debugging, and on-site hardware troubleshooting.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Not a made-up internship. Real tasks: creating professional documents with AI tools, diagnosing software issues, resolving hardware problems. Gave me real professional tech exposure years ahead of most peers.</p></div></div>
+      </div>
+
+      <div class="ac">
+        <div class="act"><div class="ai">📡</div><div class="am"><div class="atitle">ICR In-Charge Since Class VII</div><div class="adate">School &bull; Class VII onwards</div><span class="abadge bs">RESPONSIBILITY</span></div></div>
+        <div class="ashort">Serving as ICR (Inter-Class Representative) in-charge since Class VII &mdash; building communication and accountability skills alongside the technical work.</div>
+        <button class="atoggle" onclick="TA(this)"><span class="arr">&#9658;</span>&nbsp;more details</button>
+        <div class="aexpand"><div class="aei"><p>Taking on a leadership role this early helped balance the technical side of my profile with real coordination and communication experience.</p></div></div>
+      </div>
+
+    </div>
+  </section></div>
+</div>
+
+<!-- ══════════════ PROJECTS ══════════════ -->
+<div id="projects" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 004 &mdash; PROJECTS</div>
+    <h2 class="s-title">What I've <span>Built</span></h2>
+    <p class="s-desc">Open-source, real-world projects. All on GitHub. More coming &mdash; portfolio is a work in progress. <em>(Add your own intro line in the italic slot on each card.)</em></p>
+    <div class="proj-grid">
+
+      <div class="pc">
+        <div class="pimg"><div class="pib"></div>👁️</div>
+        <div class="pb">
+          <div class="pn">DrishtiY</div>
+          <div class="ptl">// Computer Vision &bull; Assistive Tech</div>
+          <div class="pintro">[ Your intro here &mdash; e.g. "An AI vision assistant built for accessibility" ]</div>
+          <div class="pdesc">Published on Autodesk Instructables and featured in a contest. Full YouTube demo available. Built using Python and OpenCV.</div>
+          <div class="ptags"><span class="ptag">Python</span><span class="ptag">OpenCV</span><span class="ptag">AI</span><span class="ptag">Raspberry Pi</span></div>
+          <div class="plinks">
+            <a href="https://github.com/ParthBoyCoder/DrishtiY" target="_blank" class="pl gh">GitHub</a>
+            <a href="https://www.youtube.com/watch?v=GrKom1cZzqs" target="_blank" class="pl yt">Demo</a>
+            <a href="https://www.instructables.com/DrishtiY/" target="_blank" class="pl inst">Instructables</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pimg"><div class="pib"></div>🤖</div>
+        <div class="pb">
+          <div class="pn">Diogo2</div>
+          <div class="ptl">// Robotics &bull; Hardware + Software</div>
+          <div class="pintro">[ Your intro here &mdash; e.g. "A robotics project documented in two separate build videos" ]</div>
+          <div class="pdesc">Two-part YouTube documentation &mdash; hardware build and software/firmware separately. Full source code on GitHub.</div>
+          <div class="ptags"><span class="ptag">Arduino</span><span class="ptag">C++</span><span class="ptag">Robotics</span><span class="ptag">ESP</span></div>
+          <div class="plinks">
+            <a href="https://github.com/ParthBoyCoder/diogo2" target="_blank" class="pl gh">GitHub</a>
+            <a href="https://youtu.be/AdPocDVmZlo" target="_blank" class="pl yt">Hardware</a>
+            <a href="https://youtu.be/wDIo554jl98" target="_blank" class="pl yt">Software</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pimg"><div class="pib"></div>📷</div>
+        <div class="pb">
+          <div class="pn">SentinAI-CAM</div>
+          <div class="ptl">// AI &bull; Security &bull; Computer Vision</div>
+          <div class="pintro">[ Your intro here &mdash; e.g. "An AI-powered security camera with real-time detection" ]</div>
+          <div class="pdesc">AI-powered camera system leveraging computer vision for real-time processing. YouTube demo available. Open-source on GitHub.</div>
+          <div class="ptags"><span class="ptag">Python</span><span class="ptag">OpenCV</span><span class="ptag">AI</span><span class="ptag">Security</span></div>
+          <div class="plinks">
+            <a href="https://github.com/ParthBoyCoder/SentinAI-CAM" target="_blank" class="pl gh">GitHub</a>
+            <a href="https://youtu.be/yS7uJyeNbx0" target="_blank" class="pl yt">Demo</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pc">
+        <div class="pimg"><div class="pib"></div>⚡</div>
+        <div class="pb">
+          <div class="pn">Etnic</div>
+          <div class="ptl">// Robotics &bull; Arduino</div>
+          <div class="pintro">[ Your intro here &mdash; e.g. "A compact robotics build with two quick demo videos" ]</div>
+          <div class="pdesc">Two YouTube Shorts showing Etnic in action. Full source code on GitHub.</div>
+          <div class="ptags"><span class="ptag">Arduino</span><span class="ptag">C++</span><span class="ptag">Robotics</span></div>
+          <div class="plinks">
+            <a href="https://github.com/ParthBoyCoder/Etnic" target="_blank" class="pl gh">GitHub</a>
+            <a href="https://www.youtube.com/shorts/p6JzFIpzOIY" target="_blank" class="pl yt">Demo 1</a>
+            <a href="https://www.youtube.com/shorts/8s4mtBEl0KU" target="_blank" class="pl yt">Demo 2</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section></div>
+</div>
+
+<!-- ══════════════ YOUTUBE ══════════════ -->
+<div id="youtube" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 005 &mdash; YOUTUBE</div>
+    <h2 class="s-title">My <span>Channel</span></h2>
+    <p class="s-desc">I document everything I build &mdash; robots, AI, and code. Small subscriber count, 5000+ real views from the maker community.</p>
+    <div class="yt-banner">
+      <div class="yta">&#9654;</div>
+      <div>
+        <div class="ytcn">@ParthCodesArduinoESP</div>
+        <div class="ytcm">Robotics &bull; Coding &bull; Arduino &bull; AI &nbsp;&bull;&nbsp; <span>5000+ total views</span></div>
+      </div>
+      <div class="ytcta">
+        <a href="https://www.youtube.com/@ParthCodesArduinoESP" target="_blank" class="btn btn-o" style="color:var(--red);border-color:rgba(255,68,68,.35);">&#9654;&nbsp; Subscribe</a>
+      </div>
+    </div>
+    <div class="yt-grid">
+      <a href="https://www.youtube.com/watch?v=GrKom1cZzqs" target="_blank" class="yc"><div class="yt">👁️<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">DrishtiY &mdash; Full Demo</div><div class="ysub">Featured on Instructables</div></div></a>
+      <a href="https://youtu.be/AdPocDVmZlo" target="_blank" class="yc"><div class="yt">🤖<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">Diogo2 &mdash; Hardware Build</div><div class="ysub">Arduino &bull; Robotics</div></div></a>
+      <a href="https://youtu.be/wDIo554jl98" target="_blank" class="yc"><div class="yt">💾<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">Diogo2 &mdash; Software / Firmware</div><div class="ysub">Arduino &bull; C++</div></div></a>
+      <a href="https://youtu.be/yS7uJyeNbx0" target="_blank" class="yc"><div class="yt">📷<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">SentinAI-CAM &mdash; Demo</div><div class="ysub">AI &bull; Security &bull; OpenCV</div></div></a>
+      <a href="https://www.youtube.com/shorts/p6JzFIpzOIY" target="_blank" class="yc"><div class="yt">⚡<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">Etnic &mdash; Short Demo 1</div><div class="ysub">YouTube Short</div></div></a>
+      <a href="https://www.youtube.com/shorts/8s4mtBEl0KU" target="_blank" class="yc"><div class="yt">⚡<div class="yp">&#9654;</div></div><div class="yi"><div class="ytitle">Etnic &mdash; Short Demo 2</div><div class="ysub">YouTube Short</div></div></a>
+    </div>
+  </section></div>
+</div>
+
+<!-- ══════════════ CONTACT ══════════════ -->
+<div id="contact" class="page">
+  <div class="container"><section>
+    <div class="s-tag">// 006 &mdash; CONTACT</div>
+    <h2 class="s-title">Let's <span>Talk</span></h2>
+    <p class="s-desc">Open to collaborations, robotics discussions, project feedback, or just saying hi. I read every message.</p>
+    <div class="cg">
+      <div class="ci">
+        <h3>Get In Touch</h3>
+        <p>Whether you're a maker, a student, a teacher, or just curious about what I'm building &mdash; reach out. Always happy to connect.</p>
+        <div class="cls">
+          <a href="mailto:banerjeeparthib63@gmail.com" class="cl"><div class="cli">&#10003;</div><div class="clt"><strong>Email</strong><span>banerjeeparthib63@gmail.com</span></div></a>
+          <a href="https://github.com/ParthBoyCoder" target="_blank" class="cl"><div class="cli">&#9674;</div><div class="clt"><strong>GitHub</strong><span>github.com/ParthBoyCoder</span></div></a>
+          <a href="https://www.youtube.com/@ParthCodesArduinoESP" target="_blank" class="cl"><div class="cli">&#9654;</div><div class="clt"><strong>YouTube</strong><span>@ParthCodesArduinoESP</span></div></a>
+          <a href="https://www.instagram.com/parthib6152" target="_blank" class="cl"><div class="cli">&#9675;</div><div class="clt"><strong>Instagram</strong><span>@parthib6152</span></div></a>
+          <a href="https://in.linkedin.com/in/parthib-banerjee-77bb61213" target="_blank" class="cl"><div class="cli">in</div><div class="clt"><strong>LinkedIn</strong><span>Parthib Banerjee</span></div></a>
+        </div>
+      </div>
+      <form class="cf" onsubmit="HF(event)">
+        <div class="fg"><label class="fl">// YOUR NAME</label><input class="fi2" type="text" placeholder="Ada Lovelace" required></div>
+        <div class="fg"><label class="fl">// YOUR EMAIL</label><input class="fi2" type="email" placeholder="ada@example.com" required></div>
+        <div class="fg"><label class="fl">// MESSAGE</label><textarea class="fta" placeholder="Hey Parth, loved your DrishtiY build..." required></textarea></div>
+        <button type="submit" class="fsub" id="sb">Send Message &rarr;</button>
+      </form>
+    </div>
+  </section></div>
+</div>
+
+<!-- FOOTER -->
+<footer id="main-footer" style="display:none">
+  Made with <span>&hearts;</span> &amp; lots of Arduino by <span>Parthib Banerjee</span><span class="wip">&#9881; Work in Progress &mdash; April 2026</span><br>
+  <a href="https://github.com/ParthBoyCoder" target="_blank">GitHub</a>
+  <a href="https://www.youtube.com/@ParthCodesArduinoESP" target="_blank">YouTube</a>
+  <a href="https://in.linkedin.com/in/parthib-banerjee-77bb61213" target="_blank">LinkedIn</a>
+  <a href="https://www.instagram.com/parthib6152" target="_blank">Instagram</a>
+</footer>
+
+<script>
+// AGE
+const BIRTH=new Date('2010-09-12T00:00:00');
+function UA(){
+  const ms=new Date()-BIRTH,y=Math.floor(ms/(365.25*24*3600*1000));
+  const rem=(ms/(365.25*24*3600*1000))-y,m=Math.floor(rem*12),d=Math.floor((rem*12-m)*30.44);
+  const el=document.getElementById('precise-age');if(el)el.textContent=`${y} yrs, ${m} mo, ${d} days`;
+  const ae=document.getElementById('age-d');if(ae)ae.textContent=y;
+}
+setInterval(UA,1000);UA();
+
+// CURSOR
+const cur=document.getElementById('cursor'),ctr=document.getElementById('cur-trail');
+document.addEventListener('mousemove',e=>{
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  setTimeout(()=>{ctr.style.left=e.clientX+'px';ctr.style.top=e.clientY+'px';},80);
+});
+function BHL(){
+  document.querySelectorAll('a,button,.ac,.pc,.fc,.yc,.cl,.atoggle').forEach(el=>{
+    el.addEventListener('mouseenter',()=>cur.classList.add('hov'));
+    el.addEventListener('mouseleave',()=>cur.classList.remove('hov'));
+  });
+}
+BHL();
+
+// TERMINAL
+const tout=document.getElementById('t-out'),tin=document.getElementById('t-in');
+const boot=[
+  {t:'Initializing parth.portfolio v2.0 ...',c:'td',d:0},
+  {t:'[OK] Robotics modules loaded',c:'tg',d:350},
+  {t:'[OK] Arduino + ESP32 environment: active',c:'tg',d:650},
+  {t:'[OK] Python 3 & OpenCV: ready',c:'tg',d:950},
+  {t:'[OK] GitHub: 4 public repos found',c:'tg',d:1150},
+  {t:'─────────────────────────────────────────',c:'td',d:1350},
+  {t:"Welcome to Parthib Banerjee's portfolio.",c:'tc',d:1550},
+  {t:'Type  "help"  to see available commands.',c:'tl',d:1700},
+  {t:'Type  "start" to enter the portfolio.',c:'ta',d:1850},
+  {t:'─────────────────────────────────────────',c:'td',d:2000},
+];
+function AL(txt,cls='tl'){
+  const d=document.createElement('div');d.className=cls;d.textContent=txt;
+  tout.appendChild(d);
+  const b=document.getElementById('t-body');b.scrollTop=b.scrollHeight;
+}
+boot.forEach(({t,c,d})=>setTimeout(()=>AL(t,c),d));
+setTimeout(()=>tin.focus(),2100);
+
+const CMDS={
+  help:()=>{AL('');AL('Available commands:','tc');AL('  start     — Enter the portfolio','tg');AL('  about     — Who is Parth?','tl');AL('  skills    — Tech stack snapshot','tl');AL('  projects  — 4 open-source projects','tl');AL('  contact   — Reach out','tl');AL('  age       — Live age counter','tl');AL('  matrix    — A surprise...','td');AL('  clear     — Clear terminal','td');AL('');},
+  about:()=>{AL('');AL('> Parthib Banerjee | 15 | Class X | Kolkata, India','tc');AL('> Robotics • AI • Arduino • Python • OpenCV','tg');AL('> Self-teaching since Class VI. Still going.','tl');AL('> State exhibitions: 6. Olympiad gold: 2x. Featured on Instructables.','ta');AL('');},
+  skills:()=>{AL('');AL('> Python   ████████████░░ 80%','tg');AL('> Arduino  █████████████░ 85%','tg');AL('> C/C++    ███████████░░░ 75%','tg');AL('> OpenCV   ███████████░░░ 72%','tg');AL('> HTML/CSS ██████████░░░░ 70%','tg');AL('');},
+  projects:()=>{AL('');AL('> DrishtiY      — github.com/ParthBoyCoder/DrishtiY','tc');AL('> Diogo2        — github.com/ParthBoyCoder/diogo2','tc');AL('> SentinAI-CAM  — github.com/ParthBoyCoder/SentinAI-CAM','tc');AL('> Etnic         — github.com/ParthBoyCoder/Etnic','tc');AL('  type "start" to view full project details.','td');AL('');},
+  contact:()=>{AL('');AL('> Email:     banerjeeparthib63@gmail.com','tc');AL('> GitHub:    github.com/ParthBoyCoder','tc');AL('> YouTube:   @ParthCodesArduinoESP','tc');AL('> Instagram: @parthib6152','tc');AL('> LinkedIn:  Parthib Banerjee','tc');AL('');},
+  age:()=>{const ms=new Date()-BIRTH,y=Math.floor(ms/(365.25*24*3600*1000)),rem=(ms/(365.25*24*3600*1000))-y,m=Math.floor(rem*12);AL(`> Parth is ${y} years and ${m} months old. Born: 12 Sept 2010.`,'ta');},
+  matrix:()=>{AL('');AL('Wake up, Parth...','tg');setTimeout(()=>AL('The Matrix has you.','tg'),400);setTimeout(()=>AL('Follow the white rabbit. 🐇','tg'),900);setTimeout(()=>AL('(Just kidding. Type "start".)','td'),1600);AL('');},
+  clear:()=>{tout.innerHTML='';},
+  start:()=>{AL('');AL('> Launching portfolio...','tg');setTimeout(()=>AL('> Verifying builder credentials... ✓','tg'),350);setTimeout(()=>AL('> Loading 4 projects, 15 achievements... ✓','tg'),700);setTimeout(()=>AL('> Welcome. Have a look around.','tc'),1050);setTimeout(EP,1600);}
+};
+tin.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  const v=tin.value.trim().toLowerCase();tin.value='';
+  AL(`parth@portfolio:~$ ${v}`,'td');
+  if(!v)return;
+  if(CMDS[v])CMDS[v]();else AL(`bash: ${v}: command not found. Try "help".`,'te');
+});
+
+function EP(){
+  document.getElementById('terminal-screen').classList.add('exit');
+  setTimeout(()=>{
+    document.getElementById('terminal-screen').style.display='none';
+    document.getElementById('main-nav').classList.add('visible');
+    document.getElementById('main-footer').style.display='block';
+    SP('home');setTimeout(BHL,150);
+  },700);
+}
+
+// PAGE ROUTING
+const PGS=['home','about','skills','achievements','projects','youtube','contact'];
+function SP(id,lnk){
+  PGS.forEach(p=>{const el=document.getElementById(p);if(el)el.classList.remove('active');});
+  const t=document.getElementById(id);if(t)t.classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+  if(lnk)lnk.classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='skills')SKB();
+  TFI();
+}
+
+// SKILL BARS
+let skDone=false;
+function SKB(){
+  if(skDone)return;skDone=true;
+  setTimeout(()=>{document.querySelectorAll('.sf').forEach(el=>{el.style.width=el.dataset.w+'%';});},200);
+}
+
+// FADE IN
+function TFI(){setTimeout(()=>{document.querySelectorAll('.fi').forEach(el=>el.classList.add('vis'));},80);}
+
+// ACHIEVEMENT EXPAND
+function TA(btn){
+  const exp=btn.nextElementSibling,isOpen=exp.classList.contains('open');
+  document.querySelectorAll('.aexpand.open').forEach(e=>e.classList.remove('open'));
+  document.querySelectorAll('.atoggle.open').forEach(b=>b.classList.remove('open'));
+  if(!isOpen){exp.classList.add('open');btn.classList.add('open');}
+}
+
+// FORM
+function HF(e){
+  e.preventDefault();const b=document.getElementById('sb');
+  b.textContent='Sending...';b.disabled=true;
+  setTimeout(()=>{
+    b.textContent="✓ Sent! I'll reply soon.";b.style.background='var(--green2)';
+    setTimeout(()=>{b.textContent='Send Message →';b.style.background='';b.disabled=false;e.target.reset();},3000);
+  },1100);
+}
+
+// INTERSECTION OBSERVER
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:.12});
+document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
