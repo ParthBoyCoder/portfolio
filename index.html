@@ -17,15 +17,15 @@
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
-  /* Hide system cursor everywhere */
-  *,*::before,*::after{cursor:none!important;}
   body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden;}
+  button,input,textarea{font:inherit;}
+  button,a{cursor:pointer;}
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:var(--bg);}
   ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
 
   /* CUSTOM CURSOR */
-  .cursor{width:14px;height:14px;border:1.5px solid var(--green);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference;}
+  .cursor{display:none;width:14px;height:14px;border:1.5px solid var(--green);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s;mix-blend-mode:difference;}
   .cursor.hov{width:30px;height:30px;background:rgba(0,255,136,.1);}
   .cursor-trail{width:5px;height:5px;background:var(--green);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;opacity:.35;transform:translate(-50%,-50%);transition:left .08s linear,top .08s linear;}
 
@@ -45,16 +45,17 @@
   /* TERMINAL */
   #terminal-screen{position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .6s ease,transform .6s ease;}
   #terminal-screen.exit{opacity:0;transform:scale(.97);pointer-events:none;}
-  .terminal-window{width:min(740px,95vw);background:var(--bg2);border:1px solid var(--border2);border-radius:10px;overflow:hidden;box-shadow:0 0 80px rgba(0,255,136,.04),0 0 0 1px rgba(0,255,136,.06);}
-  .terminal-bar{background:var(--surface);padding:.65rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
+  .terminal-window{width:min(760px,94vw);background:linear-gradient(145deg,#101820,#0b1118);border:1px solid var(--border2);border-radius:14px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.4),0 0 0 1px rgba(0,255,136,.07);}
+  .terminal-bar{background:rgba(20,28,38,.9);padding:.8rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
   .dot{width:10px;height:10px;border-radius:50%;}
   .dot-r{background:#ff5f56;}.dot-a{background:#ffbd2e;}.dot-g{background:#27c93f;}
   .terminal-title{font-family:var(--mono);font-size:.72rem;color:var(--text3);margin:0 auto;}
-  .terminal-body{padding:1.5rem;min-height:340px;font-family:var(--mono);font-size:.82rem;line-height:1.9;overflow-y:auto;max-height:70vh;}
+  .terminal-body{padding:1.5rem;min-height:340px;font-family:var(--mono);font-size:.82rem;line-height:1.9;overflow-y:auto;max-height:70vh;background:radial-gradient(circle at 80% 10%,rgba(0,255,136,.045),transparent 35%),var(--bg2);}
   .tl{color:var(--text2);}.tg{color:var(--green);}.tc{color:var(--cyan);}.ta{color:var(--amber);}.td{color:var(--text3);}.te{color:var(--red);}
   .t-prompt{display:flex;align-items:center;gap:.4rem;margin-top:.5rem;}
   .t-sym{color:var(--green);white-space:nowrap;}
-  #t-input{background:none;border:none;outline:none;color:var(--text);font-family:var(--mono);font-size:.82rem;caret-color:var(--green);flex:1;min-width:0;}
+  #t-in{background:rgba(0,255,136,.035);border:1px solid rgba(0,255,136,.16);border-radius:5px;outline:none;color:var(--text);font-family:var(--mono);font-size:.82rem;caret-color:var(--green);flex:1;min-width:0;padding:.3rem .5rem;box-shadow:inset 0 0 14px rgba(0,0,0,.18);transition:border-color .2s,box-shadow .2s;}
+  #t-in:focus{border-color:rgba(0,255,136,.55);box-shadow:0 0 0 3px rgba(0,255,136,.08),inset 0 0 14px rgba(0,0,0,.18);}
   @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
   /* PAGES */
@@ -72,7 +73,7 @@
   .hero-sub{font-family:var(--mono);font-size:.88rem;color:var(--text2);margin-bottom:2.5rem;}
   .hero-sub span{color:var(--cyan);}
   .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;margin-bottom:3rem;}
-  .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;border-radius:6px;font-family:var(--mono);font-size:.78rem;text-decoration:none;transition:all .2s;letter-spacing:.05em;border:none;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:42px;padding:.65rem 1.15rem;border-radius:6px;font-family:var(--mono);font-size:.74rem;text-decoration:none;transition:all .2s;letter-spacing:.04em;border:none;}
   .btn-p{background:var(--green);color:#080c10;font-weight:700;}
   .btn-p:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,255,136,.25);}
   .btn-o{background:transparent;color:var(--text);border:1px solid var(--border2);}
@@ -91,6 +92,8 @@
   .s-title{font-size:clamp(2rem,5vw,3.2rem);font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem;}
   .s-title span{color:var(--green);}
   .s-desc{color:var(--text2);font-size:.92rem;max-width:560px;line-height:1.75;margin-bottom:3rem;}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1.5rem;margin-bottom:2.5rem;}
+  .section-head .s-desc{margin-bottom:0;}
 
   /* ABOUT */
   .ag{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start;}
@@ -152,8 +155,11 @@
   .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:1.5rem;}
   .pc{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .3s,transform .3s,box-shadow .3s;display:flex;flex-direction:column;}
   .pc:hover{border-color:var(--green);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,255,136,.08);}
-  .pimg{height:128px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:3rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+  .pimg{height:142px;background:linear-gradient(135deg,var(--bg3),#0b141a);display:flex;align-items:center;justify-content:center;font-size:3rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
   .pib{position:absolute;inset:0;opacity:.06;background:repeating-linear-gradient(45deg,var(--green) 0,var(--green) 1px,transparent 0,transparent 50%);background-size:10px 10px;}
+  .project-logo{position:relative;z-index:1;width:64px;height:64px;padding:13px;border:1px solid rgba(0,255,136,.35);border-radius:16px;background:rgba(8,12,16,.72);color:var(--green);box-shadow:0 0 28px rgba(0,255,136,.12);}
+  .project-logo.blue{color:var(--cyan);border-color:rgba(0,212,255,.35);}
+  .project-logo.amber{color:var(--amber);border-color:rgba(255,180,0,.35);}
   .pb{padding:1.15rem;flex:1;display:flex;flex-direction:column;}
   .pn{font-size:.98rem;font-weight:700;margin-bottom:.12rem;color:var(--text);}
   .ptl{font-family:var(--mono);font-size:.63rem;color:var(--cyan);margin-bottom:.55rem;letter-spacing:.04em;}
@@ -161,12 +167,18 @@
   .pdesc{font-size:.8rem;color:var(--text2);line-height:1.65;flex:1;margin-bottom:.9rem;}
   .ptags{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.9rem;}
   .ptag{font-family:var(--mono);font-size:.6rem;padding:.17rem .48rem;background:var(--bg3);border:1px solid var(--border);border-radius:3px;color:var(--text3);}
-  .plinks{display:flex;gap:.55rem;flex-wrap:wrap;}
-  .pl{font-family:var(--mono);font-size:.67rem;color:var(--text2);text-decoration:none;padding:.3rem .72rem;border:1px solid var(--border);border-radius:5px;transition:all .2s;white-space:nowrap;}
+  .plinks{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:auto;}
+  .pl{font-family:var(--mono);font-size:.65rem;color:var(--text2);text-decoration:none;display:inline-flex;align-items:center;min-height:34px;padding:.3rem .68rem;border:1px solid var(--border);border-radius:5px;transition:all .2s;white-space:nowrap;}
   .pl:hover{color:var(--green);border-color:var(--green);}
   .pl.gh::before{content:'◈ ';}
   .pl.yt::before{content:'▷ ';color:var(--red);}
   .pl.inst::before{content:'✦ ';color:var(--amber);}
+  .project-tools{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin:-1rem 0 1.5rem;padding:.75rem 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .filter-list{display:flex;gap:.45rem;flex-wrap:wrap;}
+  .filter-btn{background:transparent;border:1px solid var(--border);border-radius:999px;color:var(--text3);font-family:var(--mono);font-size:.62rem;padding:.35rem .7rem;transition:all .2s;}
+  .filter-btn:hover,.filter-btn.active{color:var(--green);border-color:var(--green);background:var(--green3);}
+  .project-count{font-family:var(--mono);font-size:.64rem;color:var(--text3);white-space:nowrap;}
+  .pc.is-hidden{display:none;}
 
   /* YOUTUBE */
   .yt-banner{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.75rem;margin-bottom:2.25rem;}
@@ -222,7 +234,19 @@
     .nav-links{gap:.85rem;}
     .hero-stats{grid-template-columns:1fr 1fr;}
     .stat:last-child{grid-column:span 2;}
+    .container{padding:0 1rem;}
+    .sg,.ach-grid,.proj-grid,.yt-grid{grid-template-columns:minmax(0,1fr);}
     section{padding:3.5rem 0;}
+    .section-head,.project-tools{align-items:flex-start;flex-direction:column;}
+    .project-count{align-self:flex-end;}
+    .terminal-body{padding:1rem;font-size:.73rem;}
+  }
+  @media (pointer:fine) and (prefers-reduced-motion:no-preference){
+    *,*::before,*::after{cursor:none!important;}
+    .cursor{display:block;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}
   }
 </style>
 </head>
@@ -256,7 +280,7 @@
       <div id="t-out"></div>
       <div class="t-prompt">
         <span class="t-sym">parth@portfolio:~$&nbsp;</span>
-        <input type="text" id="t-in" autocomplete="off" autocorrect="off" spellcheck="false" autofocus>
+        <input type="text" id="t-in" aria-label="Terminal command input" autocomplete="off" autocorrect="off" spellcheck="false" autofocus>
       </div>
     </div>
   </div>
@@ -290,7 +314,7 @@
     <div class="ag">
       <div>
         <p class="bio">
-          Hey! I'm <strong>Parthib Banerjee</strong> &mdash; a <strong>15-year-old</strong> student from <strong>Kolkata, India</strong>, currently in <span class="hl">Class X</span>.<br><br>
+          Hey! I'm <strong>Parthib Banerjee</strong> &mdash; a student from <strong>Kolkata, India</strong>, currently in <span class="hl">Class X</span>.<br><br>
           I've been <strong>self-teaching programming since Class VI</strong>, and somewhere along the way fell completely in love with robotics and AI. I went from blinking LEDs on an Arduino to competing at <strong>state-level science exhibitions</strong> across India and placing first at Apeejay Terra Nova RoboMaze Runner.<br><br>
           I run a <span class="hl">YouTube channel</span> documenting my builds, founded and taught a <strong>robotics club</strong> at school from Class IX, and build open-source projects that are actually useful. I also do real tech work helping at <strong>my father's company</strong> since Class VII &mdash; AI docs, software debugging, and hardware fixes.<br><br>
           This portfolio is a <span class="hl">work in progress</span>, just like me. Last updated: April 2026.
@@ -465,15 +489,23 @@
   <div class="container"><section>
     <div class="s-tag">// 004 &mdash; PROJECTS</div>
     <h2 class="s-title">What I've <span>Built</span></h2>
-    <p class="s-desc">Open-source, real-world projects. All on GitHub. More coming &mdash; portfolio is a work in progress. <em>(Add your own intro line in the italic slot on each card.)</em></p>
+    <p class="s-desc">Open-source, real-world projects spanning computer vision, robotics, and embedded systems.</p>
+    <div class="project-tools">
+      <div class="filter-list" role="group" aria-label="Filter projects">
+        <button class="filter-btn active" type="button" data-filter="all">All</button>
+        <button class="filter-btn" type="button" data-filter="vision">Computer vision</button>
+        <button class="filter-btn" type="button" data-filter="robotics">Robotics</button>
+      </div>
+      <div class="project-count" id="project-count">4 projects</div>
+    </div>
     <div class="proj-grid">
 
-      <div class="pc">
-        <div class="pimg"><div class="pib"></div>👁️</div>
+      <div class="pc" data-category="vision">
+        <div class="pimg"><div class="pib"></div><svg class="project-logo blue" viewBox="0 0 24 24" fill="none" aria-label="Vision project logo"><path d="M2.5 12s3.2-5 9.5-5 9.5 5 9.5 5-3.2 5-9.5 5-9.5-5-9.5-5Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.7" stroke="currentColor" stroke-width="1.5"/><path d="M5 5.5 7 7M19 5.5 17 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <div class="pb">
           <div class="pn">DrishtiY</div>
           <div class="ptl">// Computer Vision &bull; Assistive Tech</div>
-          <div class="pintro">[ Your intro here &mdash; e.g. "An AI vision assistant built for accessibility" ]</div>
+          <div class="pintro">An AI vision assistant designed to make everyday scenes more accessible.</div>
           <div class="pdesc">Published on Autodesk Instructables and featured in a contest. Full YouTube demo available. Built using Python and OpenCV.</div>
           <div class="ptags"><span class="ptag">Python</span><span class="ptag">OpenCV</span><span class="ptag">AI</span><span class="ptag">Raspberry Pi</span></div>
           <div class="plinks">
@@ -484,12 +516,12 @@
         </div>
       </div>
 
-      <div class="pc">
-        <div class="pimg"><div class="pib"></div>🤖</div>
+      <div class="pc" data-category="robotics">
+        <div class="pimg"><div class="pib"></div><svg class="project-logo" viewBox="0 0 24 24" fill="none" aria-label="Robotics project logo"><rect x="4" y="7" width="16" height="12" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 7V5.5a4 4 0 0 1 8 0V7M8 12h.01M16 12h.01M9 16h6M12 2v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         <div class="pb">
           <div class="pn">Diogo2</div>
           <div class="ptl">// Robotics &bull; Hardware + Software</div>
-          <div class="pintro">[ Your intro here &mdash; e.g. "A robotics project documented in two separate build videos" ]</div>
+          <div class="pintro">A robotics build documented from wiring and hardware through firmware.</div>
           <div class="pdesc">Two-part YouTube documentation &mdash; hardware build and software/firmware separately. Full source code on GitHub.</div>
           <div class="ptags"><span class="ptag">Arduino</span><span class="ptag">C++</span><span class="ptag">Robotics</span><span class="ptag">ESP</span></div>
           <div class="plinks">
@@ -500,12 +532,12 @@
         </div>
       </div>
 
-      <div class="pc">
-        <div class="pimg"><div class="pib"></div>📷</div>
+      <div class="pc" data-category="vision">
+        <div class="pimg"><div class="pib"></div><svg class="project-logo blue" viewBox="0 0 24 24" fill="none" aria-label="Camera project logo"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h2l1.2-1.5h4.6L15.5 6h2A2.5 2.5 0 0 1 20 8.5v8A2.5 2.5 0 0 1 17.5 19h-11A2.5 2.5 0 0 1 4 16.5v-8Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12.5" r="3" stroke="currentColor" stroke-width="1.5"/></svg></div>
         <div class="pb">
           <div class="pn">SentinAI-CAM</div>
           <div class="ptl">// AI &bull; Security &bull; Computer Vision</div>
-          <div class="pintro">[ Your intro here &mdash; e.g. "An AI-powered security camera with real-time detection" ]</div>
+          <div class="pintro">An AI-powered security camera concept for real-time visual detection.</div>
           <div class="pdesc">AI-powered camera system leveraging computer vision for real-time processing. YouTube demo available. Open-source on GitHub.</div>
           <div class="ptags"><span class="ptag">Python</span><span class="ptag">OpenCV</span><span class="ptag">AI</span><span class="ptag">Security</span></div>
           <div class="plinks">
@@ -515,12 +547,12 @@
         </div>
       </div>
 
-      <div class="pc">
-        <div class="pimg"><div class="pib"></div>⚡</div>
+      <div class="pc" data-category="robotics">
+        <div class="pimg"><div class="pib"></div><svg class="project-logo amber" viewBox="0 0 24 24" fill="none" aria-label="Embedded project logo"><path d="m13.5 2-8 11h5l-1 9 8-11h-5l1-9Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
         <div class="pb">
           <div class="pn">Etnic</div>
           <div class="ptl">// Robotics &bull; Arduino</div>
-          <div class="pintro">[ Your intro here &mdash; e.g. "A compact robotics build with two quick demo videos" ]</div>
+          <div class="pintro">A compact Arduino robotics build with two quick demonstration videos.</div>
           <div class="pdesc">Two YouTube Shorts showing Etnic in action. Full source code on GitHub.</div>
           <div class="ptags"><span class="ptag">Arduino</span><span class="ptag">C++</span><span class="ptag">Robotics</span></div>
           <div class="plinks">
@@ -647,11 +679,13 @@ boot.forEach(({t,c,d})=>setTimeout(()=>AL(t,c),d));
 setTimeout(()=>tin.focus(),2100);
 
 const CMDS={
-  help:()=>{AL('');AL('Available commands:','tc');AL('  start     — Enter the portfolio','tg');AL('  about     — Who is Parth?','tl');AL('  skills    — Tech stack snapshot','tl');AL('  projects  — 4 open-source projects','tl');AL('  contact   — Reach out','tl');AL('  age       — Live age counter','tl');AL('  matrix    — A surprise...','td');AL('  clear     — Clear terminal','td');AL('');},
-  about:()=>{AL('');AL('> Parthib Banerjee | 15 | Class X | Kolkata, India','tc');AL('> Robotics • AI • Arduino • Python • OpenCV','tg');AL('> Self-teaching since Class VI. Still going.','tl');AL('> State exhibitions: 6. Olympiad gold: 2x. Featured on Instructables.','ta');AL('');},
+  help:()=>{AL('');AL('Available commands:','tc');AL('  start     — Enter the portfolio','tg');AL('  home      — Show the landing page','tl');AL('  about     — Who is Parth?','tl');AL('  skills    — Tech stack snapshot','tl');AL('  projects  — 4 open-source projects','tl');AL('  youtube   — Watch build demos','tl');AL('  contact   — Reach out','tl');AL('  age       — Live age counter','tl');AL('  matrix    — A surprise...','td');AL('  clear     — Clear terminal','td');AL('');},
+  about:()=>{AL('');AL('> Parthib Banerjee | Class X | Kolkata, India','tc');AL('> Robotics • AI • Arduino • Python • OpenCV','tg');AL('> Self-teaching since Class VI. Still going.','tl');AL('> State exhibitions: 6. Olympiad gold: 2x. Featured on Instructables.','ta');AL('');},
   skills:()=>{AL('');AL('> Python   ████████████░░ 80%','tg');AL('> Arduino  █████████████░ 85%','tg');AL('> C/C++    ███████████░░░ 75%','tg');AL('> OpenCV   ███████████░░░ 72%','tg');AL('> HTML/CSS ██████████░░░░ 70%','tg');AL('');},
   projects:()=>{AL('');AL('> DrishtiY      — github.com/ParthBoyCoder/DrishtiY','tc');AL('> Diogo2        — github.com/ParthBoyCoder/diogo2','tc');AL('> SentinAI-CAM  — github.com/ParthBoyCoder/SentinAI-CAM','tc');AL('> Etnic         — github.com/ParthBoyCoder/Etnic','tc');AL('  type "start" to view full project details.','td');AL('');},
   contact:()=>{AL('');AL('> Email:     banerjeeparthib63@gmail.com','tc');AL('> GitHub:    github.com/ParthBoyCoder','tc');AL('> YouTube:   @ParthCodesArduinoESP','tc');AL('> Instagram: @parthib6152','tc');AL('> LinkedIn:  Parthib Banerjee','tc');AL('');},
+  home:()=>{EP();},
+  youtube:()=>{EP();setTimeout(()=>SP('youtube'),750);},
   age:()=>{const ms=new Date()-BIRTH,y=Math.floor(ms/(365.25*24*3600*1000)),rem=(ms/(365.25*24*3600*1000))-y,m=Math.floor(rem*12);AL(`> Parth is ${y} years and ${m} months old. Born: 12 Sept 2010.`,'ta');},
   matrix:()=>{AL('');AL('Wake up, Parth...','tg');setTimeout(()=>AL('The Matrix has you.','tg'),400);setTimeout(()=>AL('Follow the white rabbit. 🐇','tg'),900);setTimeout(()=>AL('(Just kidding. Type "start".)','td'),1600);AL('');},
   clear:()=>{tout.innerHTML='';},
@@ -696,6 +730,22 @@ function SKB(){
 
 // FADE IN
 function TFI(){setTimeout(()=>{document.querySelectorAll('.fi').forEach(el=>el.classList.add('vis'));},80);}
+
+// PROJECT FILTERS
+const filterButtons=document.querySelectorAll('.filter-btn');
+const projectCards=document.querySelectorAll('.pc[data-category]');
+const projectCount=document.getElementById('project-count');
+filterButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  const filter=btn.dataset.filter;
+  filterButtons.forEach(item=>item.classList.toggle('active',item===btn));
+  let visible=0;
+  projectCards.forEach(card=>{
+    const show=filter==='all'||card.dataset.category===filter;
+    card.classList.toggle('is-hidden',!show);
+    if(show)visible++;
+  });
+  projectCount.textContent=`${visible} project${visible===1?'':'s'}`;
+}));
 
 // ACHIEVEMENT EXPAND
 function TA(btn){
